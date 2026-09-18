@@ -2,6 +2,7 @@ import { Head } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import ExpenseForm from '../components/expense-form';
 import ExpenseList from '../components/expense-list';
+import MonthlySummaryCard from '../components/monthly-summary';
 import { listExpenses } from '../lib/expense-api';
 import type { Expense } from '../types/expense';
 
@@ -11,6 +12,7 @@ export default function ExpensesPage() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const [attempt, setAttempt] = useState(0);
+    const [summaryRevision, setSummaryRevision] = useState(0);
 
     useEffect(() => {
         const controller = new AbortController();
@@ -45,6 +47,7 @@ export default function ExpensesPage() {
             ),
         );
         setSuccess(`Expense #${expense.id} saved successfully.`);
+        setSummaryRevision((previous) => previous + 1);
     }
 
     return (
@@ -86,9 +89,11 @@ export default function ExpensesPage() {
                         )}
                     </div>
 
+                    <MonthlySummaryCard revision={summaryRevision} />
+
                     {loading ? (
                         <p role="status" className="text-slate-600">
-                            Loading expenses…
+                            Loading expenses...
                         </p>
                     ) : error ? (
                         <div className="rounded-xl border border-red-200 bg-white p-6">

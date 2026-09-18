@@ -1,4 +1,5 @@
 import type { Expense, ExpenseInput, ValidationErrors } from '../types/expense';
+import type { MonthlySummary } from '../types/expense';
 
 interface ApiPayload<T> {
     data?: T;
@@ -69,4 +70,13 @@ export function createExpense(input: ExpenseInput): Promise<Expense> {
         },
         body: JSON.stringify(input),
     });
+}
+export function getMonthlySummary(
+    month: string,
+    signal?: AbortSignal,
+): Promise<MonthlySummary> {
+    return request<MonthlySummary>(
+        `/expenses/summary?month=${encodeURIComponent(month)}`,
+        { signal },
+    );
 }

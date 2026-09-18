@@ -14,3 +14,13 @@ export interface Expense extends ExpenseInput {
 }
 
 export type ValidationErrors = Partial<Record<keyof ExpenseInput, string[]>>;
+export interface MonthlySummary {
+    month: string;
+    total_lkr: string;
+    expense_count: number;
+    by_type: {
+        expense_type: ExpenseType;
+        total_lkr: string;
+        expense_count: number;
+    }[];
+}
