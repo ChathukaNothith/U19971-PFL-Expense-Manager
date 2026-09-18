@@ -6,12 +6,12 @@ The assignment brief refers to an OpenAPI 3.0.0 JSON file on Blackboard. That or
 
 ## Marked changes
 
-| Marker | Business need | Contract decision | Implementation status |
-| --- | --- | --- | --- |
-| CLARIFIED | Record spending in rupees. | Use `cost_lkr`; response amounts are decimal strings. The brief also mentions `cost_gbp`, creating a currency ambiguity. | Implemented; no currency conversion. |
-| DOCUMENTED | Save, list and inspect expenses. | Document the implemented `/expenses` and `/expenses/{expense}` endpoints, `data` envelopes, HTTP 201/404/422 responses, validation and date/ID ordering. | Implemented; exact correspondence with the unavailable original JSON is unknown. |
-| ADDED | Compare spending between months. | Add `GET /expenses/summary` with required `month=YYYY-MM`. | Implemented and tested. |
-| ADDED | Understand category spending and empty months. | Add `MonthlySummary` and `CategorySummary` schemas with `total_lkr`, `expense_count` and all three category entries. | Implemented and tested. |
+| Marker     | Business need                                  | Contract decision                                                                                                                                        | Implementation status                                                            |
+| ---------- | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| CLARIFIED  | Record spending in rupees.                     | Use `cost_lkr`; response amounts are decimal strings. The brief also mentions `cost_gbp`, creating a currency ambiguity.                                 | Implemented; no currency conversion.                                             |
+| DOCUMENTED | Save, list and inspect expenses.               | Document the implemented `/expenses` and `/expenses/{expense}` endpoints, `data` envelopes, HTTP 201/404/422 responses, validation and date/ID ordering. | Implemented; exact correspondence with the unavailable original JSON is unknown. |
+| ADDED      | Compare spending between months.               | Add `GET /expenses/summary` with required `month=YYYY-MM`.                                                                                               | Implemented and tested.                                                          |
+| ADDED      | Understand category spending and empty months. | Add `MonthlySummary` and `CategorySummary` schemas with `total_lkr`, `expense_count` and all three category entries.                                     | Implemented and tested.                                                          |
 
 `x-assignment-change` markers identify the currency clarification and summary additions inside the JSON document. The root `x-assignment-changes` list records the overall assumptions and extensions. These annotations refer to the business brief and implemented baseline; they do not assert a comparison with the missing original specification.
 
