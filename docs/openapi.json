@@ -1,0 +1,483 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Expense Manager API",
+        "version": "1.1.0",
+        "description": "Implemented expense API and monthly summary extension. The original Blackboard JSON specification was unavailable to the student. This document reconstructs the implemented contract from the assignment brief and source code; it is not a verified diff against that unavailable file. The brief requests rupees but mentions cost_gbp; this implementation uses cost_lkr for Sri Lankan rupees."
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000/api",
+            "description": "Local development server"
+        }
+    ],
+    "tags": [
+        {
+            "name": "Expenses",
+            "description": "Save, list and retrieve expenses."
+        },
+        {
+            "name": "Summary",
+            "description": "Implemented monthly spending summary extension."
+        }
+    ],
+    "paths": {
+        "/expenses": {
+            "get": {
+                "tags": [
+                    "Expenses"
+                ],
+                "operationId": "listExpenses",
+                "summary": "List expenses",
+                "description": "Returns all expenses ordered by date descending, then ID descending. An empty database returns an empty data array. Pagination is not implemented.",
+                "responses": {
+                    "200": {
+                        "description": "Expense list.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Expense"
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "date": "2026-09-18",
+                                            "cost_lkr": "250.00",
+                                            "description": "Bus fare to university",
+                                            "expense_type": "travel",
+                                            "created_at": "2026-09-18T06:00:00.000000Z",
+                                            "updated_at": "2026-09-18T06:00:00.000000Z"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Expenses"
+                ],
+                "operationId": "createExpense",
+                "summary": "Save an expense",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ExpenseInput"
+                            },
+                            "example": {
+                                "date": "2026-09-18",
+                                "cost_lkr": "250.00",
+                                "description": "Bus fare to university",
+                                "expense_type": "travel"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Expense saved.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Expense"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "date": "2026-09-18",
+                                        "cost_lkr": "250.00",
+                                        "description": "Bus fare to university",
+                                        "expense_type": "travel",
+                                        "created_at": "2026-09-18T06:00:00.000000Z",
+                                        "updated_at": "2026-09-18T06:00:00.000000Z"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Missing or invalid input.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/expenses/{expense}": {
+            "get": {
+                "tags": [
+                    "Expenses"
+                ],
+                "operationId": "getExpense",
+                "summary": "Get an individual expense",
+                "parameters": [
+                    {
+                        "name": "expense",
+                        "in": "path",
+                        "required": true,
+                        "description": "Numeric expense ID.",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        },
+                        "example": 1
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Expense found.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Expense"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "data": {
+                                        "id": 1,
+                                        "date": "2026-09-18",
+                                        "cost_lkr": "250.00",
+                                        "description": "Bus fare to university",
+                                        "expense_type": "travel",
+                                        "created_at": "2026-09-18T06:00:00.000000Z",
+                                        "updated_at": "2026-09-18T06:00:00.000000Z"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No expense exists with this ID, or the path is not a numeric ID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/expenses/summary": {
+            "x-assignment-change": "ADDED: monthly summary endpoint and month query parameter.",
+            "get": {
+                "tags": [
+                    "Summary"
+                ],
+                "operationId": "getMonthlySummary",
+                "summary": "Get monthly spending totals",
+                "description": "Includes dates from the first day of the requested month up to, but excluding, the first day of the next month. Returns a total, expense count and all three categories in travel, food, other order. Categories with no expenses have zero totals and counts. Integer cents are accumulated before formatting rupee totals.",
+                "parameters": [
+                    {
+                        "name": "month",
+                        "in": "query",
+                        "required": true,
+                        "description": "Selected month in YYYY-MM format.",
+                        "schema": {
+                            "type": "string",
+                            "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+                            "example": "2026-09"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Monthly spending summary.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "data"
+                                    ],
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/MonthlySummary"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "data": {
+                                        "month": "2026-09",
+                                        "total_lkr": "700.00",
+                                        "expense_count": 2,
+                                        "by_type": [
+                                            {
+                                                "expense_type": "travel",
+                                                "total_lkr": "250.00",
+                                                "expense_count": 1
+                                            },
+                                            {
+                                                "expense_type": "food",
+                                                "total_lkr": "450.00",
+                                                "expense_count": 1
+                                            },
+                                            {
+                                                "expense_type": "other",
+                                                "total_lkr": "0.00",
+                                                "expense_count": 0
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Missing or invalid input.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ExpenseType": {
+                "type": "string",
+                "enum": [
+                    "travel",
+                    "food",
+                    "other"
+                ]
+            },
+            "ExpenseInput": {
+                "type": "object",
+                "required": [
+                    "date",
+                    "cost_lkr",
+                    "description",
+                    "expense_type"
+                ],
+                "properties": {
+                    "date": {
+                        "type": "string",
+                        "format": "date",
+                        "description": "Valid calendar date in YYYY-MM-DD format.",
+                        "example": "2026-09-18"
+                    },
+                    "cost_lkr": {
+                        "x-assignment-change": "CLARIFIED: cost_lkr expresses the rupee requirement; cost_gbp from the brief is not accepted as a replacement.",
+                        "description": "Positive LKR amount from 0.01 to 9999999999.99, with at most two decimal places. Numeric strings are accepted and used by the React form. The server enforces the range for both input types.",
+                        "oneOf": [
+                            {
+                                "type": "number",
+                                "minimum": 0.01,
+                                "maximum": 9999999999.99,
+                                "multipleOf": 0.01
+                            },
+                            {
+                                "type": "string",
+                                "pattern": "^[0-9]+(\\.[0-9]{1,2})?$"
+                            }
+                        ],
+                        "example": "250.00"
+                    },
+                    "description": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 2000,
+                        "description": "Required description; whitespace-only values are rejected after Laravel input trimming.",
+                        "example": "Bus fare to university"
+                    },
+                    "expense_type": {
+                        "$ref": "#/components/schemas/ExpenseType"
+                    }
+                }
+            },
+            "Expense": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "date",
+                    "cost_lkr",
+                    "description",
+                    "expense_type",
+                    "created_at",
+                    "updated_at"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "minimum": 1
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "cost_lkr": {
+                        "type": "string",
+                        "pattern": "^[0-9]+\\.[0-9]{2}$",
+                        "description": "Amount in Sri Lankan rupees, serialized with two decimal places.",
+                        "example": "250.00"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "expense_type": {
+                        "$ref": "#/components/schemas/ExpenseType"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "CategorySummary": {
+                "x-assignment-change": "ADDED: spending and count per expense type.",
+                "type": "object",
+                "required": [
+                    "expense_type",
+                    "total_lkr",
+                    "expense_count"
+                ],
+                "properties": {
+                    "expense_type": {
+                        "$ref": "#/components/schemas/ExpenseType"
+                    },
+                    "total_lkr": {
+                        "type": "string",
+                        "pattern": "^[0-9]+\\.[0-9]{2}$",
+                        "description": "Amount in Sri Lankan rupees, serialized with two decimal places.",
+                        "example": "250.00"
+                    },
+                    "expense_count": {
+                        "type": "integer",
+                        "minimum": 0
+                    }
+                }
+            },
+            "MonthlySummary": {
+                "x-assignment-change": "ADDED: response for the monthly summary feature.",
+                "type": "object",
+                "required": [
+                    "month",
+                    "total_lkr",
+                    "expense_count",
+                    "by_type"
+                ],
+                "properties": {
+                    "month": {
+                        "type": "string",
+                        "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])$",
+                        "example": "2026-09"
+                    },
+                    "total_lkr": {
+                        "type": "string",
+                        "pattern": "^[0-9]+\\.[0-9]{2}$",
+                        "description": "Amount in Sri Lankan rupees, serialized with two decimal places.",
+                        "example": "250.00"
+                    },
+                    "expense_count": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "by_type": {
+                        "type": "array",
+                        "minItems": 3,
+                        "maxItems": 3,
+                        "items": {
+                            "$ref": "#/components/schemas/CategorySummary"
+                        },
+                        "description": "One entry for each type, ordered travel, food, other."
+                    }
+                }
+            },
+            "Error": {
+                "type": "object",
+                "required": [
+                    "message"
+                ],
+                "properties": {
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": true
+            },
+            "ValidationError": {
+                "type": "object",
+                "required": [
+                    "message",
+                    "errors"
+                ],
+                "properties": {
+                    "message": {
+                        "type": "string"
+                    },
+                    "errors": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "example": {
+                    "message": "The month field is required.",
+                    "errors": {
+                        "month": [
+                            "The month field is required."
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "security": [],
+    "x-assignment-changes": [
+        "Reconstructed the implemented baseline from the brief because the original JSON specification was unavailable; original paths and schemas cannot be compared directly.",
+        "Clarified currency as LKR through cost_lkr, following the rupee business requirement.",
+        "Documented data response envelopes, decimal strings, ordering, validation and missing-record responses.",
+        "Added GET /expenses/summary, required month parameter and MonthlySummary/CategorySummary schemas."
+    ]
+}
