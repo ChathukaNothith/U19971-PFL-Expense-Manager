@@ -24,9 +24,7 @@
     "paths": {
         "/expenses": {
             "get": {
-                "tags": [
-                    "Expenses"
-                ],
+                "tags": ["Expenses"],
                 "operationId": "listExpenses",
                 "summary": "List expenses",
                 "description": "Returns all expenses ordered by date descending, then ID descending. An empty database returns an empty data array. Pagination is not implemented.",
@@ -37,9 +35,7 @@
                             "application/json": {
                                 "schema": {
                                     "type": "object",
-                                    "required": [
-                                        "data"
-                                    ],
+                                    "required": ["data"],
                                     "properties": {
                                         "data": {
                                             "type": "array",
@@ -68,9 +64,7 @@
                 }
             },
             "post": {
-                "tags": [
-                    "Expenses"
-                ],
+                "tags": ["Expenses"],
                 "operationId": "createExpense",
                 "summary": "Save an expense",
                 "requestBody": {
@@ -96,9 +90,7 @@
                             "application/json": {
                                 "schema": {
                                     "type": "object",
-                                    "required": [
-                                        "data"
-                                    ],
+                                    "required": ["data"],
                                     "properties": {
                                         "data": {
                                             "$ref": "#/components/schemas/Expense"
@@ -134,9 +126,7 @@
         },
         "/expenses/{expense}": {
             "get": {
-                "tags": [
-                    "Expenses"
-                ],
+                "tags": ["Expenses"],
                 "operationId": "getExpense",
                 "summary": "Get an individual expense",
                 "parameters": [
@@ -159,9 +149,7 @@
                             "application/json": {
                                 "schema": {
                                     "type": "object",
-                                    "required": [
-                                        "data"
-                                    ],
+                                    "required": ["data"],
                                     "properties": {
                                         "data": {
                                             "$ref": "#/components/schemas/Expense"
@@ -198,9 +186,7 @@
         "/expenses/summary": {
             "x-assignment-change": "ADDED: monthly summary endpoint and month query parameter.",
             "get": {
-                "tags": [
-                    "Summary"
-                ],
+                "tags": ["Summary"],
                 "operationId": "getMonthlySummary",
                 "summary": "Get monthly spending totals",
                 "description": "Includes dates from the first day of the requested month up to, but excluding, the first day of the next month. Returns a total, expense count and all three categories in travel, food, other order. Categories with no expenses have zero totals and counts. Integer cents are accumulated before formatting rupee totals.",
@@ -224,9 +210,7 @@
                             "application/json": {
                                 "schema": {
                                     "type": "object",
-                                    "required": [
-                                        "data"
-                                    ],
+                                    "required": ["data"],
                                     "properties": {
                                         "data": {
                                             "$ref": "#/components/schemas/MonthlySummary"
@@ -278,20 +262,11 @@
         "schemas": {
             "ExpenseType": {
                 "type": "string",
-                "enum": [
-                    "travel",
-                    "food",
-                    "other"
-                ]
+                "enum": ["travel", "food", "other"]
             },
             "ExpenseInput": {
                 "type": "object",
-                "required": [
-                    "date",
-                    "cost_lkr",
-                    "description",
-                    "expense_type"
-                ],
+                "required": ["date", "cost_lkr", "description", "expense_type"],
                 "properties": {
                     "date": {
                         "type": "string",
@@ -373,11 +348,7 @@
             "CategorySummary": {
                 "x-assignment-change": "ADDED: spending and count per expense type.",
                 "type": "object",
-                "required": [
-                    "expense_type",
-                    "total_lkr",
-                    "expense_count"
-                ],
+                "required": ["expense_type", "total_lkr", "expense_count"],
                 "properties": {
                     "expense_type": {
                         "$ref": "#/components/schemas/ExpenseType"
@@ -397,12 +368,7 @@
             "MonthlySummary": {
                 "x-assignment-change": "ADDED: response for the monthly summary feature.",
                 "type": "object",
-                "required": [
-                    "month",
-                    "total_lkr",
-                    "expense_count",
-                    "by_type"
-                ],
+                "required": ["month", "total_lkr", "expense_count", "by_type"],
                 "properties": {
                     "month": {
                         "type": "string",
@@ -432,9 +398,7 @@
             },
             "Error": {
                 "type": "object",
-                "required": [
-                    "message"
-                ],
+                "required": ["message"],
                 "properties": {
                     "message": {
                         "type": "string"
@@ -444,10 +408,7 @@
             },
             "ValidationError": {
                 "type": "object",
-                "required": [
-                    "message",
-                    "errors"
-                ],
+                "required": ["message", "errors"],
                 "properties": {
                     "message": {
                         "type": "string"
@@ -465,9 +426,7 @@
                 "example": {
                     "message": "The month field is required.",
                     "errors": {
-                        "month": [
-                            "The month field is required."
-                        ]
+                        "month": ["The month field is required."]
                     }
                 }
             }
