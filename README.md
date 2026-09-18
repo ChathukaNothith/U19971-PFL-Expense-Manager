@@ -70,12 +70,12 @@ The GitHub Actions workflow runs on pushes to `main`, pull requests and manual d
 
 Base URL: `http://127.0.0.1:8000/api`. Requests and responses use JSON.
 
-| Method | Path | Behaviour |
-| --- | --- | --- |
-| GET | `/expenses` | List all expenses, newest dates first. |
-| POST | `/expenses` | Save a validated expense; return HTTP 201. |
-| GET | `/expenses/{expense}` | Fetch one record; return HTTP 404 if missing. |
-| GET | `/expenses/summary?month=2026-09` | Return monthly totals and category counts. |
+| Method | Path                              | Behaviour                                     |
+| ------ | --------------------------------- | --------------------------------------------- |
+| GET    | `/expenses`                       | List all expenses, newest dates first.        |
+| POST   | `/expenses`                       | Save a validated expense; return HTTP 201.    |
+| GET    | `/expenses/{expense}`             | Fetch one record; return HTTP 404 if missing. |
+| GET    | `/expenses/summary?month=2026-09` | Return monthly totals and category counts.    |
 
 Successful responses wrap their payload in `data`. Amounts in responses are strings with two decimal places. Validation failures return HTTP 422 with `message` and field `errors`.
 
